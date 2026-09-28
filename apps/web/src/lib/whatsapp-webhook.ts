@@ -26,7 +26,9 @@ function normalizeSupabaseUrl(value: string | undefined): string | null {
   try {
     const parsed = new URL(trimmed);
     const isLocal = parsed.protocol === "http:" && ["localhost", "127.0.0.1"].includes(parsed.hostname);
-    if (parsed.protocol !== "https:" && !isLocal) return null;
+    if (isLocal) return parsed.origin;
+    // MARK: Only the project API host is valid; a dashboard URL is a common mistake
+    if (parsed.protocol !== "https:" || !parsed.hostname.endsWith(".supabase.co")) return null;
     return parsed.origin;
   } catch {
     return null;
@@ -41,6 +43,17 @@ export function getWhatsAppWebhookConfig(env: WhatsAppEnv = process.env): WhatsA
   const supabaseUrl = normalizeSupabaseUrl(env.SUPABASE_URL);
   if (!appSecret || !verifyToken || !serviceRoleKey || !supabaseUrl) return null;
   return { appSecret, verifyToken, supabaseUrl, serviceRoleKey };
+}
+
+// MARK: Names only; values must never be returned to a caller
+// MARK: Names only; values must never be returned to a caller
+export function getMissingWhatsAppEnvNames(env: WhatsAppEnv = process.env): string[] {
+  const missing: string[] = [];
+  if (!env.WHATSAPP_APP_SECRET?.trim()) missing.push("WHATSAPP_APP_SECRET");
+  if (!env.WHATSAPP_VERIFY_TOKEN?.trim()) missing.push("WHATSAPP_VERIFY_TOKEN");
+  if (!env.SUPABASE_SERVICE_ROLE_KEY?.trim()) missing.push("SUPABASE_SERVICE_ROLE_KEY");
+  if (!normalizeSupabaseUrl(env.SUPABASE_URL)) missing.push("SUPABASE_URL");
+  return missing;
 }
 
 // SECTION: Setup checklist for the dashboard

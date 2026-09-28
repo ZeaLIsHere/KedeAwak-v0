@@ -1,6 +1,7 @@
 import {
   createWhatsAppDbClient,
   evaluateWebhookChallenge,
+  getMissingWhatsAppEnvNames,
   getWhatsAppWebhookConfig,
   handleWhatsAppWebhookPost,
   MAX_WEBHOOK_BYTES,
@@ -36,7 +37,9 @@ export async function POST(request: Request): Promise<Response> {
 
     const rawBody = new TextEncoder().encode(await request.text());
     const config = getWhatsAppWebhookConfig();
-    const db = config ? createWhatsAppDbClient(config.supabaseUrl, config.serviceRoleKey) : null;
+    // MARK: Report missing variable names only, never their values
+    if (!config) return jsonResponse({ error: "not_configured", missing: getMissingWhatsAppEnvNames() }, 503);
+    const db = createWhatsAppDbClient(config.supabaseUrl, config.serviceRoleKey);
     const result = await handleWhatsAppWebhookPost(rawBody, request.headers.get("x-hub-signature-256"), {
       config,
       db,
