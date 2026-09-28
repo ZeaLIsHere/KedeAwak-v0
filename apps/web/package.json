@@ -11,6 +11,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@kedeawak/agent": "workspace:*",
+    "@kedeawak/whatsapp": "workspace:*",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.57.0",
     "zod": "^4.0.0",

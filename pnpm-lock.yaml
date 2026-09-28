@@ -168,6 +168,12 @@ importers:
 
   apps/web:
     dependencies:
+      '@kedeawak/agent':
+        specifier: workspace:*
+        version: link:../../packages/agent
+      '@kedeawak/whatsapp':
+        specifier: workspace:*
+        version: link:../../packages/whatsapp
       '@supabase/ssr':
         specifier: ^0.6.1
         version: 0.6.1(@supabase/supabase-js@2.117.2)
