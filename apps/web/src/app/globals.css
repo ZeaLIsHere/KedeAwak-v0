@@ -166,8 +166,27 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--brand-prima
   .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .featured-stat { grid-column: 1 / -1; }
 }
+/* MARK: Authenticated dashboard */
+.dash-shell { min-height: 100vh; }
+.dash-shell .topbar-inner { max-width: 900px; }
+.dash-nav { background: var(--surface); border-bottom: 1px solid var(--border); }
+.dash-nav-inner { max-width: 900px; margin: auto; display: flex; gap: 8px; padding: 6px 16px; overflow-x: auto; }
+.dash-nav-link { display: inline-flex; align-items: center; min-height: 48px; padding: 10px 14px; border-radius: 10px; font-size: 14px; font-weight: 700; color: var(--foreground); text-decoration: none; white-space: nowrap; }
+.dash-nav-link:hover { background: #edf2fa; }
+.dash-nav-link[aria-current="page"] { background: var(--brand-primary-light); color: #004fab; }
+.dash-main { max-width: 900px; margin: auto; padding: 20px 16px max(32px, env(safe-area-inset-bottom)); }
+.dash-shell .content-stack { gap: 16px; }
+.dash-shell .footer-note { margin-top: 8px; }
+a.full-history-button, a.primary-button, a.secondary-button { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+a.full-history-button { display: block; }
+.empty-state { margin: 0; padding: 22px 16px; border: 1px dashed var(--border); border-radius: 12px; color: var(--text-muted); font-size: 14px; line-height: 21px; text-align: center; }
+.field-hint { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 18px; }
+.entry-actions { position: sticky; bottom: max(8px, env(safe-area-inset-bottom)); display: flex; flex-wrap: wrap; gap: 8px; padding-top: 8px; background: var(--surface); }
+.entry-actions .primary-button { flex: 1; }
 @media (max-width: 480px) {
   .brand { font-size: 16px; }
+  .dash-nav-inner { padding: 6px 12px; }
+  .dash-main { padding: 16px 16px max(32px, env(safe-area-inset-bottom)); }
   .brand-symbol { width: 36px; height: 36px; font-size: 19px; }
   .demo-label { max-width: 165px; min-width: 0; font-size: 11px; line-height: 15px; }
   .demo-label strong { font-size: 12px; }

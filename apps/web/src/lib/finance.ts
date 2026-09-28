@@ -1,3 +1,5 @@
+export { formatRupiah } from "./ledger";
+
 export type Transaction = {
   id: string;
   title: string;
@@ -12,12 +14,7 @@ export type Summary = {
   cashDifference: number;
 };
 
-const rupiahFormatter = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 });
 const MAX_ENTRY = 1_000_000_000;
-
-export function formatRupiah(amount: number): string {
-  return `Rp${rupiahFormatter.format(amount)}`;
-}
 
 export function summarize(transactions: readonly Transaction[]): Summary {
   const totals = transactions.reduce(

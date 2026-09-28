@@ -19,3 +19,5 @@ export async function createClient() {
     },
   });
 }
+
+export type SupabaseServerClient = NonNullable<Awaited<ReturnType<typeof createClient>>>;
