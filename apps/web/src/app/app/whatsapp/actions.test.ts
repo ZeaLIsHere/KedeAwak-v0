@@ -4,7 +4,8 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/membership", () => ({ getIdentity: vi.fn(), getMembership: vi.fn() }));
 
 import { getIdentity, getMembership } from "@/lib/membership";
-import { saveWhatsAppNumber, whatsappNumberSchema, type WhatsAppNumberState } from "./actions";
+import { whatsappNumberSchema } from "@/lib/whatsapp-number";
+import { saveWhatsAppNumber, type WhatsAppNumberState } from "./actions";
 
 const initialState: WhatsAppNumberState = { status: "idle", message: "" };
 

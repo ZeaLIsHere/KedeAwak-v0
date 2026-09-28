@@ -1,17 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { getIdentity, getMembership } from "@/lib/membership";
+import { whatsappNumberSchema } from "@/lib/whatsapp-number";
 
 export type WhatsAppNumberState = { status: "idle" | "success" | "error"; message: string };
-
-export const whatsappNumberSchema = z.object({
-  phone_number_id: z
-    .string()
-    .trim()
-    .refine((value) => value === "" || /^[0-9]{5,32}$/.test(value), "Gunakan ID angka dari Meta, tanpa spasi."),
-});
 
 export async function saveWhatsAppNumber(_state: WhatsAppNumberState, form: FormData): Promise<WhatsAppNumberState> {
   const parsed = whatsappNumberSchema.safeParse({ phone_number_id: form.get("phone_number_id") ?? "" });
