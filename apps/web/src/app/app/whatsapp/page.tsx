@@ -110,7 +110,7 @@ export default async function WhatsAppPage({ searchParams }: { searchParams: Pro
           </dl>
           {missingEnv.length > 0 && (
             <p className="field-error">
-              Variabel yang belum terbaca: {missingEnv.join(", ")}. Isi di apps/web/.env.local (bukan .env di akar), lalu hentikan dan jalankan ulang server.
+              Variabel yang belum terbaca: {missingEnv.join(", ")}. Isi di apps/web/.env.local (bukan .env di akar), lalu hentikan dan jalankan ulang server. Alamat Supabase memakai NEXT_PUBLIC_SUPABASE_URL bila ada.
             </p>
           )}
           <p className="field-hint">Status ini hanya membaca keberadaan konfigurasi. Nilai rahasia tidak pernah ditampilkan di aplikasi.</p>

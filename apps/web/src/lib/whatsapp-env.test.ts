@@ -19,6 +19,17 @@ describe("whatsapp webhook environment", () => {
     expect(getMissingWhatsAppEnvNames(completeEnv)).toEqual([]);
   });
 
+  it("reuses the public project URL instead of requiring a duplicate variable", () => {
+    const env = {
+      WHATSAPP_APP_SECRET: completeEnv.WHATSAPP_APP_SECRET,
+      WHATSAPP_VERIFY_TOKEN: completeEnv.WHATSAPP_VERIFY_TOKEN,
+      SUPABASE_SERVICE_ROLE_KEY: completeEnv.SUPABASE_SERVICE_ROLE_KEY,
+      NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
+    };
+    expect(getMissingWhatsAppEnvNames(env)).toEqual([]);
+    expect(getWhatsAppWebhookConfig(env)?.supabaseUrl).toBe("https://example.supabase.co");
+  });
+
   it("names every missing variable without exposing any value", () => {
     const missing = getMissingWhatsAppEnvNames({});
     expect(missing).toEqual([
@@ -34,6 +45,7 @@ describe("whatsapp webhook environment", () => {
     expect(getMissingWhatsAppEnvNames({ ...completeEnv, SUPABASE_URL: "https://supabase.com/dashboard/project/abc" })).toEqual([
       "SUPABASE_URL",
     ]);
+    expect(getMissingWhatsAppEnvNames({ ...completeEnv, SUPABASE_URL: "https://supabase.com/dashboard/project/abc", NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co" })).toEqual([]);
     expect(getMissingWhatsAppEnvNames({ ...completeEnv, WHATSAPP_APP_SECRET: "   " })).toEqual(["WHATSAPP_APP_SECRET"]);
     expect(getMissingWhatsAppEnvNames({ ...completeEnv, SUPABASE_SERVICE_ROLE_KEY: "" })).toEqual(["SUPABASE_SERVICE_ROLE_KEY"]);
   });
