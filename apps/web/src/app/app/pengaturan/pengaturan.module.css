@@ -1,0 +1,119 @@
+/* MARK: Feature status notice */
+.noticeBox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.noticeBox :global(.muted) {
+  margin: 0;
+}
+
+.noticeBox :global(.field-hint) {
+  margin: 0;
+}
+
+/* MARK: Read only status list */
+.statusList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+}
+
+.statusRow {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid #e5e7eb;
+  padding: 14px 0;
+}
+
+.statusRow:first-child {
+  border-top: 0;
+}
+
+.statusRow dt {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.statusRow dd {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  text-align: right;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.statusRow dd :global(.field-hint) {
+  font-weight: 400;
+}
+
+/* MARK: Auto reply switch */
+.switchForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.switchRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fbfcfe;
+  cursor: pointer;
+}
+
+.switchRow input {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+.switchRow > span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.switchRow span span {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+/* MARK: Shop profile form */
+.formStep {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formStep[hidden] {
+  display: none;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.formActions :global(.primary-button) {
+  flex: 1;
+}
