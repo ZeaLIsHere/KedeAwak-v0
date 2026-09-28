@@ -1,0 +1,132 @@
+/* MARK: Debt summary */
+.summaryBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summaryBox > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.summaryBox strong {
+  font-size: clamp(22px, 3vw, 28px);
+  line-height: 36px;
+  letter-spacing: -.035em;
+  overflow-wrap: anywhere;
+}
+
+.summaryBox :global(.field-hint) {
+  margin: 0;
+}
+
+/* MARK: Create debt form */
+.formStep {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formStep[hidden] {
+  display: none;
+}
+
+.formStep select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #9ca3af;
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--foreground);
+  background: white;
+  font-size: 16px;
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.formActions :global(.primary-button) {
+  flex: 1;
+}
+
+/* MARK: Debt list rows */
+.debtItem {
+  padding-bottom: 18px;
+}
+
+.debtItem:first-child :global(.data-row) {
+  border-top: 0;
+}
+
+.overdueNote {
+  color: var(--expense-text);
+  font-weight: 700;
+}
+
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rowActions button {
+  flex: 1 1 140px;
+}
+
+.dangerButton {
+  color: #a91e1e;
+  border-color: #edb6b6;
+  background: var(--expense-bg);
+}
+
+.dangerButton:hover {
+  background: #ffdede;
+}
+
+.dangerButtonSolid {
+  background: #c62828;
+  border-color: #c62828;
+  color: #ffffff;
+}
+
+.dangerButtonSolid:hover {
+  background: #a91e1e;
+}
+
+/* MARK: Inline delete confirmation */
+.confirmBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #edb6b6;
+  border-radius: 12px;
+  background: #fff7f7;
+}
+
+.confirmBox :global(.muted) {
+  margin: 0;
+}
+
+.confirmBox :global(.entry-actions) {
+  padding-top: 0;
+  background: transparent;
+}
+
+@media (max-width: 520px) {
+  .fieldRow {
+    grid-template-columns: 1fr;
+  }
+}
