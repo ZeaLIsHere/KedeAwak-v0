@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { formatJakartaDateTime } from "@/lib/ledger";
-import { getWhatsAppSetupChecklist } from "@/lib/whatsapp-webhook";
+import { getMissingWhatsAppEnvNames, getWhatsAppSetupChecklist } from "@/lib/whatsapp-webhook";
 import { loadShopContext } from "../context";
 import { AppShell, RoleNotice, ShopErrorCard } from "../shell";
 import { WhatsAppNumberForm } from "./number-form";
@@ -62,6 +62,7 @@ export default async function WhatsAppPage({ searchParams }: { searchParams: Pro
   const { percakapan } = await searchParams;
   const selectedId = parseConversationIdParam(percakapan);
   const checklist = getWhatsAppSetupChecklist();
+  const missingEnv = getMissingWhatsAppEnvNames();
   const [{ conversations, error }, phoneResult] = await Promise.all([
     getWhatsAppConversations(client, shopId),
     getShopPhoneNumberId(client, shopId),
@@ -107,6 +108,11 @@ export default async function WhatsAppPage({ searchParams }: { searchParams: Pro
               </dd>
             </div>
           </dl>
+          {missingEnv.length > 0 && (
+            <p className="field-error">
+              Variabel yang belum terbaca: {missingEnv.join(", ")}. Isi di apps/web/.env.local (bukan .env di akar), lalu hentikan dan jalankan ulang server.
+            </p>
+          )}
           <p className="field-hint">Status ini hanya membaca keberadaan konfigurasi. Nilai rahasia tidak pernah ditampilkan di aplikasi.</p>
         </section>
 
