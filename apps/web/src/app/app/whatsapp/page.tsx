@@ -3,6 +3,7 @@ import { formatJakartaDateTime } from "@/lib/ledger";
 import { getWhatsAppSetupChecklist } from "@/lib/whatsapp-webhook";
 import { loadShopContext } from "../context";
 import { AppShell, RoleNotice, ShopErrorCard } from "../shell";
+import { WhatsAppNumberForm } from "./number-form";
 import {
   CONVERSATION_LIMIT,
   getConversationMessages,
@@ -109,6 +110,16 @@ export default async function WhatsAppPage({ searchParams }: { searchParams: Pro
           <p className="field-hint">Status ini hanya membaca keberadaan konfigurasi. Nilai rahasia tidak pernah ditampilkan di aplikasi.</p>
         </section>
 
+        <section className="panel" aria-labelledby="wa-number-title">
+          <div className="section-heading">
+            <div><p className="eyebrow">NOMOR BISNIS</p><h2 id="wa-number-title">Sambungkan nomor WhatsApp warung</h2></div>
+          </div>
+          <p className="muted">
+            Pesan masuk hanya disimpan jika ID nomor di Meta sama dengan ID yang tersimpan di warung ini.
+          </p>
+          <WhatsAppNumberForm current={phoneResult.phoneNumberId} />
+        </section>
+
         <section className="panel" aria-labelledby="wa-checklist-title">
           <div className="section-heading">
             <div><p className="eyebrow">PANDUAN ONBOARDING</p><h2 id="wa-checklist-title">Checklist pengaturan Meta</h2></div>
@@ -188,7 +199,7 @@ export default async function WhatsAppPage({ searchParams }: { searchParams: Pro
                     >
                       <span className={styles.conversationMain}>
                         <strong>{conversation.customerPhone}</strong>
-                        <span>{conversation.handledBy === "owner" ? "Ditangani pemilik" : "Ditangani AI"}</span>
+                        <span>{conversation.handledBy === "owner" ? "Ditangani pemilik" : "Menunggu pemilik"}</span>
                       </span>
                       <span className={styles.conversationTime}>{formatJakartaDateTime(conversation.lastMessageAt)}</span>
                     </Link>
