@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { formatJakartaDate, formatRupiah, todayInJakarta } from "@/lib/ledger";
 import { loadShopContext } from "./context";
-import { getTodaySummary, getTransactions } from "./data";
+import { getLowStockProducts, getTodaySummary, getTransactions } from "./data";
 import { CashList } from "./cash-list";
 import { QuickAddForm } from "./quick-add-form";
 import { AppShell, ShopErrorCard } from "./shell";
@@ -25,13 +25,15 @@ export default async function AppPage() {
   }
 
   const now = new Date();
-  const [summaryResult, recentResult] = await Promise.all([
+  const [summaryResult, recentResult, stockResult] = await Promise.all([
     getTodaySummary(client, shopId, now),
     getTransactions(client, shopId, 5),
+    getLowStockProducts(client, shopId),
   ]);
   if (summaryResult.error || recentResult.error) return <AppShell shopName={shopName} active="ringkasan"><ShopErrorCard /></AppShell>;
   const summary = summaryResult.summary;
   const transactions = recentResult.transactions;
+  const lowStock = stockResult.error ? null : stockResult.lowStock;
 
   return (
     <AppShell shopName={shopName} active="ringkasan">
@@ -58,6 +60,24 @@ export default async function AppPage() {
             <span className="stat-hint">Uang masuk − uang keluar. Bukan laba.</span>
           </div>
         </section>
+
+        {lowStock !== null && lowStock.length > 0 && (
+          <section className="panel" aria-labelledby="low-stock-title">
+            <div className="section-heading">
+              <div><p className="eyebrow">PERLU DILIHAT</p><h2 id="low-stock-title">Stok menipis</h2></div>
+              <span className="count-pill">{lowStock.length}</span>
+            </div>
+            <ul className="data-list">
+              {lowStock.slice(0, 5).map((product) => (
+                <li className="data-row" key={product.id}>
+                  <div><strong>{product.name}</strong><span>Ambang minimum {product.minStock} {product.unit}</span></div>
+                  <div className="row-end"><strong>{product.stockQty} {product.unit}</strong><span className="status-pill warning">Stok menipis</span></div>
+                </li>
+              ))}
+            </ul>
+            <Link className="full-history-button" href="/app/produk">Kelola produk dan stok</Link>
+          </section>
+        )}
 
         <QuickAddForm today={todayInJakarta(now)} />
 

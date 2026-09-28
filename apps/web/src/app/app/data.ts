@@ -1,5 +1,7 @@
+import { listLowStockProducts, type Product } from "@/lib/inventory";
 import { getJakartaDayRange, sumRupiah } from "@/lib/ledger";
 import type { SupabaseServerClient } from "@/lib/supabase/server";
+import { getProducts } from "./produk/data";
 
 export type CashTransaction = {
   id: string;
@@ -44,6 +46,14 @@ export async function getTodaySummary(client: SupabaseServerClient, shopId: stri
   const expense = sumRupiah(((expenses.data ?? []) as { amount: number | string }[]).map((row) => row.amount));
   return { summary: { income, expense, difference: income - expense }, error: false } as const;
 }
+
+export async function getLowStockProducts(client: SupabaseServerClient, shopId: string) {
+  const { products, error } = await getProducts(client, shopId);
+  if (error || !products) return { lowStock: null, error: true } as const;
+  return { lowStock: listLowStockProducts(products), error: false } as const;
+}
+
+export type { Product };
 
 export async function getTransactions(client: SupabaseServerClient, shopId: string, limit: number) {
   const [sales, expenses] = await Promise.all([
