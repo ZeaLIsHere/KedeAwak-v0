@@ -1,0 +1,9 @@
+# WhatsApp webhook demo foundation
+
+`acceptWebhook(rawBody, signature, appSecret, trustedShop, store)` returns an HTTP status decision, but does not create an HTTP endpoint. Pass the exact request bytes before JSON parsing, the `X-Hub-Signature-256` header, the server-side Meta app secret, and a trusted `shopId` plus its configured `phoneNumberId`. Never resolve the shop from message content or an LLM argument. Respond with the returned status after synchronous verification, validation, and in-memory enqueue; perform any business processing separately by reading `store.takePending(shopId)`.
+
+The parser extracts text, image, audio, and document messages. It ignores other message types and status-only events; it does not download media, process statuses, or send replies. Invalid signatures return 401; malformed or oversized payloads and mismatched phone-number IDs return 400. The simulator uses synthetic identifiers and a fixed demo-only secret; it prints a signed body and header with `node scripts/simulate-whatsapp-webhook.mjs` from the workspace root.
+
+This is a **single-process demo store only**: deduplication and pending messages disappear on restart, memory grows with unique message IDs, and draining pending items does not provide reliable delivery. HTTP 200 only means the demo store accepted or had already seen the message, not that a worker completed it. Production requires durable message persistence with a unique `(shop_id, wa_message_id)` constraint and a durable, atomic enqueue before acknowledging, followed by an asynchronous worker.
+
+After dependencies are installed and the workspace lockfile is updated by the project maintainer, run `pnpm --filter @kedeawak/whatsapp typecheck`, `pnpm --filter @kedeawak/whatsapp lint`, and `pnpm --filter @kedeawak/whatsapp test`.

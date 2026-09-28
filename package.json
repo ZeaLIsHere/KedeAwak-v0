@@ -1,0 +1,18 @@
+{
+  "name": "kedeawak",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AI business assistant for warung/UMKM, integrated with WhatsApp",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@12.6.0",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "lint": "pnpm --filter web lint && pnpm --filter @kedeawak/whatsapp lint && pnpm --filter @kedeawak/agent lint",
+    "typecheck": "pnpm --filter web typecheck && pnpm --filter @kedeawak/db typecheck && pnpm --filter @kedeawak/whatsapp typecheck && pnpm --filter @kedeawak/agent typecheck",
+    "test": "pnpm --filter @kedeawak/whatsapp test && pnpm --filter @kedeawak/agent test",
+    "simulate:whatsapp": "node scripts/simulate-whatsapp-webhook.mjs"
+  }
+}
