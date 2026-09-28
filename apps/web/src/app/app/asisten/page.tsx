@@ -1,9 +1,10 @@
-import { resolveAssistantConfig } from "@/lib/assistant";
+import { parseDailyAiQuota, resolveAssistantConfig } from "@/lib/assistant";
 import { formatJakartaDate } from "@/lib/ledger";
+import { getIdentity } from "@/lib/membership";
 import { loadShopContext } from "../context";
 import { AppShell, RoleNotice, ShopErrorCard } from "../shell";
 import { AsistenChat } from "./asisten-chat";
-import { getTodayAiUsage } from "./data";
+import { getAssistantUserId, getOpenPendingAction, getTodayAiUsage } from "./data";
 import styles from "./asisten.module.css";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +14,8 @@ export default async function AssistantPage() {
   if (!context) return <AppShell shopName="KedeAwak" active="asisten"><ShopErrorCard /></AppShell>;
   const { client, shopId, shopName, role } = context;
 
-  if (role !== "owner") {
+  // MARK: Owner gets write tools; staff is read-only; anything else is refused (FR-AI-01/04)
+  if (role !== "owner" && role !== "staff") {
     return (
       <AppShell shopName={shopName} active="asisten">
         <RoleNotice feature="Asisten" />
@@ -21,9 +23,20 @@ export default async function AssistantPage() {
     );
   }
 
+  const canWrite = role === "owner";
   const configured = resolveAssistantConfig(process.env) !== null;
+  const quotaLimit = parseDailyAiQuota(process.env);
   const now = new Date();
-  const usage = await getTodayAiUsage(client, shopId, now);
+
+  const { authId } = await getIdentity();
+  const { userId } = await getAssistantUserId(client, authId);
+  const [usage, pending] = await Promise.all([
+    getTodayAiUsage(client, shopId, now),
+    userId ? getOpenPendingAction(client, shopId, userId, now) : Promise.resolve(null),
+  ]);
+
+  const used = usage.used ?? 0;
+  const initialPending = pending ? { id: pending.id, summary: pending.summary } : null;
 
   return (
     <AppShell shopName={shopName} active="asisten">
@@ -52,31 +65,41 @@ export default async function AssistantPage() {
 
         <section className="panel" aria-labelledby="asisten-usage-title">
           <div className="section-heading">
-            <div><p className="eyebrow">PEMAKAIAN AI</p><h2 id="asisten-usage-title">Catatan kuota harian</h2></div>
+            <div><p className="eyebrow">PEMAKAIAN AI</p><h2 id="asisten-usage-title">Kuota harian</h2></div>
             <span className="subtle-tag">{formatJakartaDate(now)}</span>
           </div>
           <p className="muted">
             {usage.error
               ? "Catatan pemakaian AI belum dapat dibaca."
-              : `Pemakaian AI hari ini: ${usage.aiCalls} panggilan (tercatat pada usage_counters).`}
+              : `Pemakaian AI hari ini: ${used} dari ${quotaLimit} panggilan.`}
           </p>
           <p className="field-hint">
-            Pembatasan kuota harian (FR-QUOTA-01) belum aktif. Angka ini hanya tampilan; halaman asisten tidak memblokir
-            permintaan dan tidak menambah kuota.
+            Kuota ini ditegakkan di server (FR-QUOTA-01/02). Saat habis, asisten berhenti memanggil AI sampai besok. Kuota
+            diatur lewat <code>DAILY_AI_QUOTA_FREE</code> (bawaan {quotaLimit}).
           </p>
         </section>
 
-        <AsistenChat configured={configured} />
+        <AsistenChat configured={configured} canWrite={canWrite} quota={{ used, limit: quotaLimit }} initialPending={initialPending} />
 
         <section className="panel" aria-labelledby="asisten-limits-title">
           <div className="section-heading">
-            <div><p className="eyebrow">BATASAN SAAT INI</p><h2 id="asisten-limits-title">Yang belum tersedia</h2></div>
+            <div><p className="eyebrow">BATASAN SAAT INI</p><h2 id="asisten-limits-title">Yang perlu diketahui</h2></div>
           </div>
           <ul className={styles.guardrailList}>
-            <li>Asisten hanya bisa membaca lewat check_stock dan get_report.</li>
+            {canWrite ? (
+              <>
+                <li>Pemilik dapat membaca stok dan laporan, serta mengajukan pencatatan pengeluaran dan penjualan.</li>
+                <li>
+                  Pencatatan pengeluaran dan penjualan tidak langsung tersimpan. Asisten meminta persetujuan lebih dahulu;
+                  data ditulis hanya setelah Anda menyetujui.
+                </li>
+              </>
+            ) : (
+              <li>Peran karyawan hanya dapat membaca stok dan laporan. Pencatatan transaksi hanya untuk pemilik.</li>
+            )}
             <li>
-              Membuat pesanan, pengeluaran, penjualan, atau purchase order sengaja belum tersedia karena persetujuan pemilik
-              (HITL, FR-HITL-04) belum terhubung. Gunakan halaman aplikasi terkait untuk mencatat data.
+              Pembuatan purchase order dan balasan otomatis ke pelanggan tetap memerlukan alur persetujuan dan belum tersedia
+              di halaman ini (FR-HITL-04).
             </li>
             <li>Asisten tidak mengirim pesan ke pelanggan dan tidak membaca percakapan WhatsApp.</li>
             <li>Semua angka uang dan stok dihitung oleh kode dari data warung, bukan oleh AI.</li>
