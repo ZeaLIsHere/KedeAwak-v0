@@ -1,0 +1,150 @@
+/* MARK: Create order form */
+.formStep {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formStep[hidden] {
+  display: none;
+}
+
+.formStep select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #9ca3af;
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--foreground);
+  background: white;
+  font-size: 16px;
+}
+
+/* MARK: In-memory line editor */
+.lineList,
+.reviewList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lineRow,
+.reviewRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fbfcfe;
+}
+
+.lineInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.lineInfo strong {
+  overflow-wrap: anywhere;
+}
+
+.lineInfo span {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.lineSubtotal {
+  flex: none;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.lineRow button {
+  flex: none;
+}
+
+/* MARK: Deterministic total */
+.totalBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid #b8d3f6;
+  border-radius: 12px;
+  background: var(--brand-primary-light);
+}
+
+.totalBox strong {
+  font-size: 26px;
+  line-height: 34px;
+  letter-spacing: -.03em;
+  color: #004fab;
+  overflow-wrap: anywhere;
+}
+
+.totalBoxStrong {
+  border-width: 2px;
+}
+
+/* MARK: Order list rows */
+.orderItem {
+  padding-bottom: 18px;
+}
+
+.orderItem:first-child :global(.data-row) {
+  border-top: 0;
+}
+
+.statusActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.statusActions button {
+  flex: 1 1 160px;
+}
+
+/* MARK: Completion confirmation */
+.completeButton {
+  background: #0057c7;
+  border-color: #0057c7;
+  color: #ffffff;
+}
+
+.confirmBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #b8d3f6;
+  border-radius: 12px;
+  background: #f5f9ff;
+}
+
+.confirmBox :global(.muted) {
+  margin: 0;
+}
+
+.confirmBox :global(.entry-actions) {
+  padding-top: 0;
+  background: transparent;
+}
+
+@media (max-width: 520px) {
+  .lineRow,
+  .reviewRow {
+    flex-wrap: wrap;
+  }
+}
