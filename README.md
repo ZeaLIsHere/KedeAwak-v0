@@ -1,6 +1,6 @@
 # KedeAwak
 
-Asisten bisnis AI untuk warung dan UMKM yang dirancang untuk terhubung dengan WhatsApp. Kebutuhan produk ada di `PRD.md`, kebutuhan teknis di `SRS.md`, dan aturan kerja di `AGENT.md`.
+Asisten bisnis AI untuk warung dan UMKM yang dirancang untuk terhubung dengan WhatsApp. Kebutuhan produk ada di `PRD.md`, kebutuhan teknis di `SRS.md`, aturan kerja di `AGENT.md`, dan status implementasi di `progress.md`.
 
 ## Status implementasi
 
