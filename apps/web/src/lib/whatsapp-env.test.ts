@@ -30,14 +30,16 @@ describe("whatsapp webhook environment", () => {
     expect(getWhatsAppWebhookConfig(env)?.supabaseUrl).toBe("https://example.supabase.co");
   });
 
+  it("accepts the current secret key and still accepts the legacy service role key", () => {
+    const { SUPABASE_SERVICE_ROLE_KEY: legacy, ...rest } = completeEnv;
+    expect(getMissingWhatsAppEnvNames({ ...rest, SUPABASE_SECRET_KEY: "sb_secret_synthetic" })).toEqual([]);
+    expect(getWhatsAppWebhookConfig({ ...rest, SUPABASE_SECRET_KEY: "sb_secret_synthetic" })?.serviceRoleKey).toBe("sb_secret_synthetic");
+    expect(getWhatsAppWebhookConfig({ ...rest, SUPABASE_SERVICE_ROLE_KEY: legacy })?.serviceRoleKey).toBe(legacy);
+  });
+
   it("names every missing variable without exposing any value", () => {
     const missing = getMissingWhatsAppEnvNames({});
-    expect(missing).toEqual([
-      "WHATSAPP_APP_SECRET",
-      "WHATSAPP_VERIFY_TOKEN",
-      "SUPABASE_SERVICE_ROLE_KEY",
-      "SUPABASE_URL",
-    ]);
+    expect(missing).toEqual(["WHATSAPP_APP_SECRET", "WHATSAPP_VERIFY_TOKEN", "SUPABASE_SECRET_KEY", "SUPABASE_URL"]);
     expect(missing.join(" ")).not.toContain("synthetic");
   });
 
@@ -47,6 +49,8 @@ describe("whatsapp webhook environment", () => {
     ]);
     expect(getMissingWhatsAppEnvNames({ ...completeEnv, SUPABASE_URL: "https://supabase.com/dashboard/project/abc", NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co" })).toEqual([]);
     expect(getMissingWhatsAppEnvNames({ ...completeEnv, WHATSAPP_APP_SECRET: "   " })).toEqual(["WHATSAPP_APP_SECRET"]);
-    expect(getMissingWhatsAppEnvNames({ ...completeEnv, SUPABASE_SERVICE_ROLE_KEY: "" })).toEqual(["SUPABASE_SERVICE_ROLE_KEY"]);
+    expect(getMissingWhatsAppEnvNames({ ...completeEnv, SUPABASE_SECRET_KEY: "", SUPABASE_SERVICE_ROLE_KEY: "" })).toEqual([
+      "SUPABASE_SECRET_KEY",
+    ]);
   });
 });

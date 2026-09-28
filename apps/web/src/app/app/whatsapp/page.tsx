@@ -147,8 +147,8 @@ export default async function WhatsAppPage({ searchParams }: { searchParams: Pro
               done={checklist.phoneNumberId}
             />
             <ChecklistItem
-              label="Penyimpanan server (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)"
-              hint="Menulis pesan masuk dengan kebijakan RLS di sisi server."
+              label="Penyimpanan server (SUPABASE_SECRET_KEY)"
+              hint="Kunci rahasia server, bukan kunci publik. Kunci lama SUPABASE_SERVICE_ROLE_KEY masih diterima."
               done={checklist.serviceRole}
             />
             <ChecklistItem

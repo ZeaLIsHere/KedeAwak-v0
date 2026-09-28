@@ -40,11 +40,16 @@ function resolveSupabaseUrl(env: WhatsAppEnv): string | null {
   return normalizeSupabaseUrl(env.SUPABASE_URL) ?? normalizeSupabaseUrl(env.NEXT_PUBLIC_SUPABASE_URL);
 }
 
+// MARK: Prefer the current secret key, keep supporting the legacy service_role JWT
+function resolveSecretKey(env: WhatsAppEnv): string | undefined {
+  return env.SUPABASE_SECRET_KEY?.trim() || env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+}
+
 // MARK: Server-only configuration; never expose the service role key to the client
 export function getWhatsAppWebhookConfig(env: WhatsAppEnv = process.env): WhatsAppWebhookConfig | null {
   const appSecret = env.WHATSAPP_APP_SECRET?.trim();
   const verifyToken = env.WHATSAPP_VERIFY_TOKEN?.trim();
-  const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  const serviceRoleKey = resolveSecretKey(env);
   const supabaseUrl = resolveSupabaseUrl(env);
   if (!appSecret || !verifyToken || !serviceRoleKey || !supabaseUrl) return null;
   return { appSecret, verifyToken, supabaseUrl, serviceRoleKey };
@@ -56,7 +61,7 @@ export function getMissingWhatsAppEnvNames(env: WhatsAppEnv = process.env): stri
   const missing: string[] = [];
   if (!env.WHATSAPP_APP_SECRET?.trim()) missing.push("WHATSAPP_APP_SECRET");
   if (!env.WHATSAPP_VERIFY_TOKEN?.trim()) missing.push("WHATSAPP_VERIFY_TOKEN");
-  if (!env.SUPABASE_SERVICE_ROLE_KEY?.trim()) missing.push("SUPABASE_SERVICE_ROLE_KEY");
+  if (!resolveSecretKey(env)) missing.push("SUPABASE_SECRET_KEY");
   if (!resolveSupabaseUrl(env)) missing.push("SUPABASE_URL");
   return missing;
 }
@@ -76,7 +81,7 @@ export function getWhatsAppSetupChecklist(env: WhatsAppEnv = process.env): Whats
   const verifyToken = Boolean(env.WHATSAPP_VERIFY_TOKEN?.trim());
   const appSecret = Boolean(env.WHATSAPP_APP_SECRET?.trim());
   const phoneNumberId = Boolean(env.WHATSAPP_PHONE_NUMBER_ID?.trim());
-  const serviceRole = Boolean(env.SUPABASE_SERVICE_ROLE_KEY?.trim()) && Boolean(resolveSupabaseUrl(env));
+  const serviceRole = Boolean(resolveSecretKey(env)) && Boolean(resolveSupabaseUrl(env));
   const accessToken = Boolean(env.WHATSAPP_ACCESS_TOKEN?.trim());
   const baseUrl = normalizeAppBaseUrl(env.APP_BASE_URL);
   return {
