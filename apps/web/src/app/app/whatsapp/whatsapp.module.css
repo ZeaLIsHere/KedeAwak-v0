@@ -1,0 +1,191 @@
+/* MARK: Connection status list */
+.statusList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 0 12px;
+}
+
+.statusRow {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid #e5e7eb;
+  padding: 14px 0;
+}
+
+.statusRow:first-child {
+  border-top: 0;
+}
+
+.statusRow dt {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.statusRow dd {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  text-align: right;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.statusRow dd :global(.field-hint) {
+  font-weight: 400;
+}
+
+/* MARK: Meta setup checklist */
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.checklistItem {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid #e5e7eb;
+  padding: 14px 0;
+}
+
+.checklistItem:first-child {
+  border-top: 0;
+}
+
+.checklistItem > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.checklistItem strong {
+  font-size: 14px;
+  line-height: 21px;
+  overflow-wrap: anywhere;
+}
+
+.callbackValue {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 18px;
+  overflow-wrap: anywhere;
+}
+
+/* MARK: Conversation list */
+.conversationList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conversationLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 48px;
+  border-top: 1px solid #e5e7eb;
+  padding: 14px 0;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.conversationList li:first-child .conversationLink {
+  border-top: 0;
+}
+
+.conversationLink:hover {
+  background: #f5f8fd;
+}
+
+.conversationLink[aria-current="true"] {
+  font-weight: 700;
+}
+
+.conversationMain {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.conversationMain span {
+  color: #4b5563;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.conversationTime {
+  flex: none;
+  color: #4b5563;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+/* MARK: Message list */
+.messageList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.messageItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  background: #fbfcfe;
+}
+
+.messageItem.outbound {
+  background: var(--brand-primary-light);
+  border-color: #b8d3f6;
+}
+
+.messageMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #4b5563;
+}
+
+.messageBody {
+  margin: 0;
+  font-size: 14px;
+  line-height: 21px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.messageEmpty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 19px;
+}
