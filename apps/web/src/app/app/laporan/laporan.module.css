@@ -1,0 +1,147 @@
+/* MARK: Period selector */
+.periodNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.periodLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.periodLink:hover {
+  background: #edf2fa;
+}
+
+.periodLink[aria-current="page"] {
+  background: var(--brand-primary-light);
+  border-color: #a5c5f4;
+  color: #004fab;
+}
+
+/* MARK: Summary grid */
+.summaryGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.summaryNote {
+  margin: 0;
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 19px;
+}
+
+/* MARK: Daily cash chart */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chartRow {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.chartDay {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+.chartBars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.barTrack {
+  display: block;
+  height: 10px;
+  border-radius: 5px;
+  background: #eef1f5;
+  overflow: hidden;
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+}
+
+.incomeBar {
+  background: var(--income-text);
+}
+
+.expenseBar {
+  background: var(--expense-text);
+}
+
+.chartValue {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  font-size: 12px;
+  line-height: 17px;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .chartRow {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .chartValue {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: start;
+    gap: 12px;
+  }
+}
