@@ -5,7 +5,8 @@ Asisten bisnis AI untuk warung dan UMKM yang dirancang untuk terhubung dengan Wh
 ## Status implementasi
 
 - Monorepo pnpm dengan aplikasi Next.js dan paket untuk database, agent, tools, WhatsApp, multimodal, serta forecasting. Turborepo belum dipakai: workspace pnpm cukup untuk paket yang aktif saat ini.
-- Preview dashboard responsif tetap tersedia di `/demo`: ringkasan, riwayat, produk/stok, pesanan, dan status asisten memakai data sintetis.
+- Preview dashboard responsif tetap tersedia di `/demo` dengan data sintetis.
+- Aplikasi pemilik di `/app` mencakup ringkasan kas, transaksi, produk dan stok, pesanan, laporan, utang, supplier, pengaturan, integrasi WhatsApp masuk, dan asisten baca-saja.
 - Pendaftaran/masuk email dan kata sandi, konfirmasi email, keluar, serta onboarding awal warung tersedia di `/` dan `/app`. Alur nyata baru aktif setelah project Supabase cloud dikonfigurasi dan migrasi diterapkan.
 - Migrasi awal Supabase untuk tabel SRS, relasi tenant, dan RLS di `supabase/migrations/`. Belum dijalankan pada PostgreSQL lokal.
 - Modul verifikasi tanda tangan dan parsing webhook WhatsApp, deduplikasi dan antrean **in-memory khusus demo**, serta simulator payload sintetis. Belum ada route HTTP maupun worker produksi.
@@ -33,7 +34,14 @@ pnpm build
 pnpm simulate:whatsapp
 ```
 
-Simulator hanya mencetak body dan header bertanda tangan dengan data sintetis. Lihat `packages/whatsapp/README.md` untuk kontrak modul dan batasan penyimpanan memori.
+Simulator hanya mencetak body dan header bertanda tangan dengan data sintetis. Lihat `packages/whatsapp/README.md` untuk kontrak modul dan batasan penyimpanan memori, serta `scripts/README.md` untuk mengirim payload sintetis ke endpoint webhook lokal.
+
+## Integrasi opsional
+
+Selain tiga variabel Supabase di atas, integrasi berikut hanya aktif jika variabelnya diisi. Semua nilai ini **tanpa** awalan `NEXT_PUBLIC_` kecuali yang memang publik:
+
+- WhatsApp masuk: `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_PHONE_NUMBER_ID`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. Atur callback Meta ke `<APP_BASE_URL>/api/whatsapp/webhook`, lalu simpan nomor bisnis pada `shops.wa_phone_number_id`. Balasan otomatis dan kirim pesan keluar belum tersedia.
+- Asisten: `LLM_API_KEY` dan `LLM_MODEL`. Tanpa keduanya, halaman `/app/asisten` hanya menampilkan panduan setup dan tidak mengarang jawaban.
 
 ## Mengaktifkan akun dan warung nyata (FR-AUTH-01, FR-AUTH-02)
 
