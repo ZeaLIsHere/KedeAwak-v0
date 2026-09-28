@@ -14,7 +14,7 @@ Dokumen ini mencatat implementasi yang tersedia di repositori, bukan rencana yan
 |---|---|---|---|
 | 1. Monorepo dan fondasi | Sebagian | Git, pnpm workspace, Next.js, TypeScript strict, Tailwind dengan token desain, struktur paket, serta perintah lint/typecheck/test/build tersedia. | PWA belum disiapkan; paket tools, multimodal, dan forecasting masih kerangka. |
 | 2. Database dan autentikasi | Sebagian | Migrasi awal berisi tabel SRS dan RLS per warung; tipe data awal tersedia. | Jalankan dan uji migrasi di Supabase lokal, uji isolasi tenant, buat auth dan onboarding pemilik. |
-| 3. Fitur inti P0 | Sebagian | Pustaka webhook demo, adapter DeepSeek, Context Lock in-memory, dan halaman awal tersedia. | Buat endpoint webhook, penyimpanan/antrean persisten, orchestrator, Tool Layer, dan dashboard yang membaca data nyata. |
+| 3. Fitur inti P0 | Sebagian | Pustaka webhook demo, adapter DeepSeek, Context Lock in-memory, dan preview dashboard interaktif tersedia. | Buat endpoint webhook, penyimpanan/antrean persisten, orchestrator, Tool Layer, dan dashboard yang membaca data nyata. |
 | 4. Integrasi dan penyempurnaan | Belum | Belum ada alur bisnis terintegrasi. | Tambahkan multimodal, laporan, alert stok, PO dengan persetujuan, serta balasan pelanggan setelah fondasi P0 aman. |
 
 ## Pelacakan kebutuhan P0
@@ -32,11 +32,11 @@ Dokumen ini mencatat implementasi yang tersedia di repositori, bukan rencana yan
 | Pengeluaran dan laporan (`FR-FIN-01`; `FR-RPT-01`, `02`, `05`) | Belum | Tabel pengeluaran dan penjualan baru ada dalam migrasi. | Tool pengeluaran dan agregasi laporan deterministik dari data warung. |
 | Supplier dan PO (`FR-PO-01`–`04`, `06`) | Belum | Tabel supplier/PO tersedia; penulisan PO langsung dari klien diblokir dalam RLS. | Kelola supplier, buat draft, validasi persetujuan di backend, kirim ke supplier, uji tolak/ubah/kedaluwarsa. |
 | Balasan pelanggan (`FR-CS-01`, `02`) | Belum | Belum ada balasan otomatis atau pengambilalihan. | Jawaban hanya dari data warung, kendali pemilik, dan pembatasan tool pelanggan. |
-| Dashboard dan kuota (`FR-DASH-01`–`05`; `FR-QUOTA-01`, `02`) | Sebagian | `apps/web/src/app/` berisi halaman awal responsif tanpa angka bisnis rekaan. | Auth, halaman dan data nyata, notifikasi, kuota harian; PWA belum tersedia. |
+| Dashboard dan kuota (`FR-DASH-01`–`05`; `FR-QUOTA-01`, `02`) | Sebagian | `apps/web/src/app/` memuat preview responsif dengan data sintetis berlabel demo, navigasi lima tampilan, dan pencatatan kas hanya selama sesi; perhitungan diuji di `apps/web/src/lib/finance.test.ts`. | Hubungkan auth, data warung nyata, notifikasi dan kuota; PWA belum tersedia. |
 
 ## Validasi yang sudah dilakukan
 
-Pada baseline `bb8b334`, perintah `pnpm lint`, `pnpm typecheck`, `pnpm test` (**24 tes lulus**) dan `pnpm build` lulus. Tes yang ada hanya mencakup pustaka webhook, Context Lock, dan klien DeepSeek dengan respons tiruan. Belum ada tes integrasi, E2E skenario S1–S5, atau uji RLS langsung di PostgreSQL. Migrasi belum dijalankan karena Supabase CLI tidak tersedia di lingkungan pengembangan saat itu.
+Pada baseline `bb8b334`, perintah `pnpm lint`, `pnpm typecheck`, `pnpm test` (24 tes) dan `pnpm build` lulus. Setelah preview dashboard ditambahkan, keempat perintah dijalankan ulang dan **28 tes lulus**, termasuk empat tes perhitungan serta validasi formulir demo. Belum ada tes integrasi, E2E skenario S1–S5, atau uji RLS langsung di PostgreSQL. Migrasi belum dijalankan karena Supabase CLI tidak tersedia di lingkungan pengembangan saat itu.
 
 ## Urutan kerja berikutnya
 
@@ -46,4 +46,4 @@ Pada baseline `bb8b334`, perintah `pnpm lint`, `pnpm typecheck`, `pnpm test` (**
 4. Bangun alur demo P0 S1–S5 dan dashboard dengan data nyata. Sambungkan Context Lock ke persetujuan PO; jangan mengirim ke supplier sebelum persetujuan eksplisit.
 5. Setelah alur teks stabil, lanjutkan STT/OCR dan fitur P0 lainnya. Redis dan Meta Cloud API menggantikan komponen in-memory/simulator sebelum penggunaan produksi.
 
-**Batasan saat ini:** Jangan memakai modul in-memory untuk data atau persetujuan produksi. API key DeepSeek hanya boleh disediakan lewat environment server. `.env.example` masih merupakan berkas lokal yang belum di-commit; periksa isinya sebelum memutuskan untuk melacaknya di Git.
+**Batasan saat ini:** Dashboard yang bisa dibuka dengan `pnpm dev` adalah preview lokal dengan transaksi, produk, dan pesanan sintetis; pencatatan baru hilang saat halaman dimuat ulang. Jangan memakai modul in-memory untuk data atau persetujuan produksi. API key DeepSeek hanya boleh disediakan lewat environment server. `.env.example` masih merupakan berkas lokal yang belum di-commit; periksa isinya sebelum memutuskan untuk melacaknya di Git.

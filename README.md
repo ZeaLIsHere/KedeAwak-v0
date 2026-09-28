@@ -5,7 +5,7 @@ Asisten bisnis AI untuk warung dan UMKM yang dirancang untuk terhubung dengan Wh
 ## Status implementasi
 
 - Monorepo pnpm dengan aplikasi Next.js dan paket untuk database, agent, tools, WhatsApp, multimodal, serta forecasting. Turborepo belum dipakai: workspace pnpm cukup untuk paket yang aktif saat ini.
-- Halaman awal responsif memakai token dari `DESIGN_SYSTEM.md`. Belum menampilkan data bisnis karena autentikasi dan koneksi database belum dibuat.
+- Preview dashboard responsif memakai token dari `DESIGN_SYSTEM.md`: ringkasan, riwayat, produk/stok, pesanan, dan status asisten. Semua data adalah contoh sintetis, bukan data bisnis nyata.
 - Migrasi awal Supabase untuk tabel SRS, relasi tenant, dan RLS di `supabase/migrations/`. Belum dijalankan pada PostgreSQL lokal.
 - Modul verifikasi tanda tangan dan parsing webhook WhatsApp, deduplikasi dan antrean **in-memory khusus demo**, serta simulator payload sintetis. Belum ada route HTTP maupun worker produksi.
 - Context Lock **in-memory khusus pengembangan** dengan batas waktu dan tes untuk persetujuan, penolakan, perubahan, dan kedaluwarsa. Belum terhubung ke pengiriman PO.
@@ -19,6 +19,8 @@ Butuh Node.js 20+ dan pnpm 12.6.0. Jalankan dari akar repositori:
 pnpm install
 pnpm dev
 ```
+
+Buka `http://localhost:3000` di browser. Tidak perlu akun Supabase, token WhatsApp, Redis, atau API key DeepSeek untuk preview. Di halaman **Ringkasan**, coba tombol **Uang masuk** atau **Uang keluar**, isi nominal dan keterangan, lalu lihat perubahan ringkasan dan riwayat. Catatan tambahan hanya tersimpan selama halaman masih terbuka; memuat ulang mengembalikan data awal. Angka dan tanggal contoh tidak mewakili data warung sungguhan. Tab **Asisten** menampilkan status integrasi, bukan chat AI aktif.
 
 Perintah pemeriksaan:
 
