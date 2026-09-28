@@ -31,7 +31,7 @@ Dokumen ini mencatat implementasi yang tersedia di repositori, bukan rencana yan
 | `/app/supplier` | Sebagian | CRUD supplier. PO dan pengiriman ke supplier belum tersedia karena penulisan PO diblokir RLS. |
 | `/app/pengaturan` | Sebagian | Ubah profil warung dan balasan otomatis. Koneksi WhatsApp belum aktif. |
 | `/app/whatsapp` | Sebagian | Status koneksi, daftar percakapan, isi pesan masuk. Belum ada balasan otomatis dan kirim pesan keluar. |
-| `/app/asisten` | Sebagian | Chat dengan tool baca-saja (`check_stock`, `get_report`). Butuh `LLM_API_KEY`; belum ada `agent_logs`, kuota, dan aksi tulis. |
+| `/app/asisten` | Sebagian | Chat peran pemilik/karyawan dengan tool baca-saja dan aksi tulis yang menunggu persetujuan, log tool, dan penghitung kuota. Butuh `LLM_API_KEY`. |
 | `/demo` | Selesai | Preview sintetis untuk memperlihatkan tampilan tanpa akun. |
 
 ## Pelacakan kebutuhan P0
@@ -42,8 +42,8 @@ Dokumen ini mencatat implementasi yang tersedia di repositori, bukan rencana yan
 | Peran dan nomor WA (`FR-AUTH-03`, `04`) | Sebagian | Peran `owner`/`staff` dibatasi di UI dan aksi server; nomor pemilik disimpan tetapi belum diverifikasi. | Verifikasi nomor sebelum dipakai mengenali instruksi WhatsApp; dukungan karyawan penuh. |
 | WhatsApp masuk (`FR-WA-01`–`05`, `09`, `10`) | Sebagian | `packages/whatsapp`, `apps/web/src/app/api/whatsapp/webhook/route.ts`, dan `/app/whatsapp`; verifikasi tanda tangan, idempotensi, dan penyimpanan pesan. | Unduh media via Graph API, status pengiriman, dan pengujian dengan Meta sungguhan. |
 | WhatsApp keluar (`FR-WA-06`–`08`) | Belum | Belum ada pengiriman pesan dan template. | Kirim pesan keluar, template di luar jendela 24 jam, catat status. |
-| AI dan keamanan peran (`FR-AI-01`–`09`) | Sebagian | `apps/web/src/lib/assistant.ts` dan `/app/asisten` memakai adapter DeepSeek dengan tool baca-saja, validasi Zod, dan pesan setup bila kunci belum ada. | `agent_logs`, batas kuota, pemilihan prompt per peran, dan larangan tool tulis sudah sebagian; percakapan multi-giliran belum ada. |
-| Context Lock dan HITL (`FR-HITL-01`–`05`) | Sebagian | `packages/agent/src/context-lock.ts` diuji untuk setuju/tolak/ubah/kedaluwarsa. | Hubungkan ke Redis dan balasan WhatsApp/dashboard; belum ada aksi berisiko yang dieksekusi. |
+| AI dan keamanan peran (`FR-AI-01`–`09`) | Sebagian | `/app/asisten` memilih prompt dan tool menurut peran, menjalankan tool baca-saja (`check_stock`, `get_report`), mencatat setiap panggilan ke `agent_logs`, memakai riwayat percakapan terbatas, dan menolak menjawab tanpa data. Kuota harian dihitung di `usage_counters` dengan batas `DAILY_AI_QUOTA_FREE`. | RAG pgvector (FR-AI-03) belum ada karena penyedia embedding belum dipilih; eskalasi otomatis (FR-AI-08) dan balasan pelanggan lewat WhatsApp belum terhubung. Riwayat percakapan belum disimpan permanen. |
+| Context Lock dan HITL (`FR-HITL-01`–`05`) | Sebagian | `packages/agent/src/context-lock.ts` diuji untuk setuju/tolak/ubah/kedaluwarsa, dan alur asisten memakai tabel `assistant_pending_actions` dengan TTL, konsumsi sekali pakai, serta tombol setujui/tolak. Aksi tulis (`create_expense`, `create_sale`) hanya dijalankan setelah persetujuan eksplisit pemilik. | Penyimpanan masih di PostgreSQL, bukan Redis seperti SRS; PO dan balasan pihak ketiga belum melewati alur ini. |
 | Input multimodal (`FR-MM-01`–`04`) | Belum | Paket `packages/multimodal/` masih kerangka. | STT Bahasa Indonesia, OCR terstruktur, ambang keyakinan, konfirmasi pengguna. |
 | Pesanan dan penjualan (`FR-ORD-01`–`06`) | Sebagian | `/app/pesanan` membuat pesanan, mengubah status, dan menyelesaikan lewat `complete_order` yang mencatat penjualan serta stok. | Notifikasi pesanan baru, ubah/batal dari chat, dan pesanan otomatis dari pesan pelanggan. |
 | Verifikasi pembayaran (`FR-PAY-01`–`05`) | Belum | Baru berupa penandaan indikatif di `/app/pesanan`; belum ada unggah/ekstraksi bukti dan deteksi duplikat. | Ekstraksi bukti bayar dan pencocokan nominal. |
@@ -63,26 +63,28 @@ Dokumen ini mencatat implementasi yang tersedia di repositori, bukan rencana yan
 | `20260928000001_harden_shop_registration.sql` | Diterapkan pada project cloud development. |
 | `20260928000002_add_sale_description.sql` | Diterapkan pada project cloud development. |
 | `20260928000003_order_completion.sql` | **Belum diterapkan.** Berisi RPC `set_order_status` dan `complete_order` serta pencabutan UPDATE langsung pada `orders`. |
-| `20260928000004_audit_log_insert_policy.sql` | **Belum diterapkan.** Kebijakan INSERT jejak audit untuk pemilik. |
+| `20260928000004_audit_log_insert_policy.sql` | Diterapkan pada project cloud development. |
+| `20260928000005_assistant_actions_and_logs.sql` | **Belum diterapkan.** Tabel `assistant_pending_actions`, kebijakan INSERT `agent_logs`, dan INSERT/UPDATE `usage_counters`. |
 
-Tanpa `00003`, halaman pesanan akan gagal menyimpan perubahan status dan penyelesaian pesanan. Tanpa `00004`, stok opname produk menolak ditulis karena jejak audit gagal disimpan.
+Tanpa `00005`, alur persetujuan asisten, pencatatan log tool, dan kuota harian akan ditolak oleh RLS.
 
 ## Validasi yang sudah dilakukan
 
-`pnpm lint`, `pnpm typecheck`, `pnpm test`, dan `pnpm build` lulus. Total **242 tes** (218 web, 8 WhatsApp, 16 agent) mencakup validasi nominal, zona waktu Asia/Jakarta, pemetaan tabel yang benar, penolakan peran non-pemilik, pengabaian `shop_id` dari formulir, perhitungan total pesanan, saldo utang, dan verifikasi tanda tangan webhook. Pemilik sudah mencoba manual di project cloud: daftar, konfirmasi email, masuk, keluar, onboarding, pencatatan kas, dan halaman produk. Belum ada tes otomatis lintas-`shop_id` (RLS) terhadap database nyata, pengujian webhook dengan Meta, atau E2E skenario S1–S5.
+`pnpm lint`, `pnpm typecheck`, `pnpm test`, dan `pnpm build` lulus. Total **283 tes** (259 web, 8 WhatsApp, 16 agent) mencakup validasi nominal, zona waktu Asia/Jakarta, pemetaan tabel yang benar, penolakan peran non-pemilik, pengabaian `shop_id` dari formulir, perhitungan total pesanan, saldo utang, dan verifikasi tanda tangan webhook. Pemilik sudah mencoba manual di project cloud: daftar, konfirmasi email, masuk, keluar, onboarding, pencatatan kas, dan halaman produk. Belum ada tes otomatis lintas-`shop_id` (RLS) terhadap database nyata, pengujian webhook dengan Meta, atau E2E skenario S1–S5.
 
 ## Urutan kerja berikutnya
 
-1. Terapkan migrasi `00003` dan `00004` setelah ditinjau, lalu uji pesanan, stok opname, dan isolasi RLS antarwarung.
+1. Terapkan migrasi `00005` setelah ditinjau agar persetujuan asisten, log tool, dan kuota harian dapat ditulis, lalu uji isolasi RLS antarwarung.
 2. Sambungkan pesan WhatsApp masuk menjadi pesanan dan verifikasi bukti bayar, termasuk unduh media.
-3. Bangun alur PO dengan Context Lock di Redis sebagai aksi berisiko pertama dengan persetujuan pemilik.
+3. Pindahkan Context Lock asisten ke Redis dan pakai alur yang sama untuk PO serta pesan ke pihak ketiga.
 4. Tambahkan balasan otomatis pelanggan dengan batas peran dan kendali pemilik.
-5. Setelah alur teks stabil, kerjakan multimodal (STT/OCR), kuota, notifikasi realtime, dan PWA.
+5. Setelah alur teks stabil, kerjakan multimodal (STT/OCR), notifikasi realtime, dan PWA.
 
 ## Batasan saat ini
 
-- Halaman pesanan dan jejak audit belum berfungsi sampai migrasi `00003` dan `00004` diterapkan.
-- Webhook WhatsApp memerlukan `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_PHONE_NUMBER_ID`, `SUPABASE_URL`, dan `SUPABASE_SERVICE_ROLE_KEY`; unduh media belum ada, dan balasan otomatis belum aktif.
+- Alur persetujuan asisten, `agent_logs`, dan kuota harian belum berfungsi sampai migrasi `00005` diterapkan.
+- Webhook WhatsApp memerlukan `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, dan `WHATSAPP_PHONE_NUMBER_ID`, plus kunci rahasia server (`SUPABASE_SECRET_KEY` atau `SUPABASE_SERVICE_ROLE_KEY` lama); `SUPABASE_URL` memakai `NEXT_PUBLIC_SUPABASE_URL`. Unduh media belum ada dan balasan otomatis belum aktif.
+- Asisten hanya boleh memakai kunci LLM di server. Kuota dihitung per giliran pengguna, bukan per panggilan tool, dan karyawan hanya memperoleh tool baca.
 - Asisten memerlukan `LLM_API_KEY` dan `LLM_MODEL` di `apps/web/.env.local` (tanpa awalan `NEXT_PUBLIC_`). Tanpa kunci itu, halaman hanya menampilkan panduan setup.
 - Beberapa total laporan memakai pembacaan PostgREST dengan batas 1000 baris; volume besar perlu agregasi SQL.
 - Pelunasan utang dan pembuatan pesanan belum atomik, dan percakapan tidak memiliki batasan unik per pelanggan.

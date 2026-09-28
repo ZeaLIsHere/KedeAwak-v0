@@ -41,7 +41,7 @@ Simulator hanya mencetak body dan header bertanda tangan dengan data sintetis. L
 Selain tiga variabel Supabase di atas, integrasi berikut hanya aktif jika variabelnya diisi. Semua nilai ini **tanpa** awalan `NEXT_PUBLIC_` kecuali yang memang publik:
 
 - WhatsApp masuk: `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_PHONE_NUMBER_ID`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. Atur callback Meta ke `<APP_BASE_URL>/api/whatsapp/webhook`, lalu simpan nomor bisnis pada `shops.wa_phone_number_id`. Balasan otomatis dan kirim pesan keluar belum tersedia.
-- Asisten: `LLM_API_KEY` dan `LLM_MODEL`. Tanpa keduanya, halaman `/app/asisten` hanya menampilkan panduan setup dan tidak mengarang jawaban.
+- Asisten: `LLM_API_KEY` dan `LLM_MODEL`, opsional `APPROVAL_TTL_MINUTES` (default 30) dan `DAILY_AI_QUOTA_FREE` (default 30). Tanpa kunci LLM, halaman `/app/asisten` hanya menampilkan panduan setup dan tidak mengarang jawaban. Asisten hanya membaca stok dan laporan secara langsung; pembuatan pengeluaran atau penjualan selalu menunggu persetujuan pemilik melalui kartu konfirmasi.
 
 ## Mengaktifkan akun dan warung nyata (FR-AUTH-01, FR-AUTH-02)
 
